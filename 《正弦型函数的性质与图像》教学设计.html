@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三角函数图像变换教学</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4a89dc;
+            --secondary-color: #3bafda;
+            --accent-color: #37bc9b;
+            --light-color: #e6f9ff;
+            --dark-color: #2c3e50;
+            --text-color: #34495e;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            color: white;
+        }
+        
+        h1, h2, h3, h4 {
+            margin-top: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.4em;
+            color: white;
+        }
+        
+        .subtitle {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .scenario-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .scenario-card {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .spring-container {
+            height: 250px;
+            position: relative;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+        
+        .spring-system {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .spring {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 8px;
+            margin-left: -4px;
+            transform-origin: top center;
+            background: repeating-linear-gradient(
+                to bottom,
+                #aaa,
+                #aaa 5px,
+                transparent 5px,
+                transparent 10px
+            );
+            background-size: 100% 10px;
+            transition: height 0.3s ease;
+        }
+        
+        .ball {
+            position: absolute;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            margin-left: -15px;
+            background: radial-gradient(circle at 30% 30%, white, var(--primary-color));
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: top 0.3s ease;
+            z-index: 2;
+        }
+        
+        .equilibrium {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #ccc;
+        }
+        
+        .parameter-display {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .parameter {
+            text-align: center;
+            padding: 12px 15px;
+            min-width: 100px;
+            background: linear-gradient(145deg, #f5f7fa, #e6e9ed);
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        
+        .parameter:hover {
+            transform: translateY(-3px);
+        }
+        
+        .parameter-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 5px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+        }
+        
+        .graph-section {
+            flex: 2;
+            min-width: 300px;
+        }
+        
+        .theory-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .graph-container {
+            height: 350px;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .control-group {
+            flex: 1;
+            min-width: 180px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--dark-color);
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 8px;
+            height: 10px;
+            border-radius: 5px;
+            -webkit-appearance: none;
+            background: #e0e5ec;
+            box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.6),
+                        inset -3px -3px 6px rgba(255, 255, 255, 0.8);
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+        
+        .value-display {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--dark-color);
+            padding: 8px;
+            background: linear-gradient(145deg, #f5f7fa, #e6e9ed);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        button {
+            background: linear-gradient(145deg, var(--primary-color), #3a70c2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            margin: 5px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .step {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #e0e5ec, #f5f7fa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 4px 4px 8px rgba(163, 177, 198, 0.6),
+                       -4px -4px 8px rgba(255, 255, 255, 0.8);
+        }
+        
+        .step:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 6px 6px 12px rgba(163, 177, 198, 0.6),
+                       -6px -6px 12px rgba(255, 255, 255, 0.8);
+        }
+        
+        .step.active {
+            background: linear-gradient(145deg, var(--primary-color), #3a70c2);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(74, 137, 220, 0.5);
+        }
+        
+        .step.completed {
+            background: linear-gradient(145deg, var(--accent-color), #2ca789);
+            color: white;
+        }
+        
+        .explanation {
+            background: linear-gradient(145deg, #f5f7fa, #e6e9ed);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 6px solid var(--accent-color);
+            transition: all 0.3s ease;
+            opacity: 1;
+            box-shadow: 4px 4px 8px rgba(163, 177, 198, 0.1),
+                       -4px -4px 8px rgba(255, 255, 255, 0.8);
+        }
+        
+        .explanation[style*="display: none"] {
+            display: block !important;
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+            padding: 0;
+            margin: 0;
+            border: none;
+        }
+        
+        .explanation h3 {
+            margin-top: 0;
+            color: var(--dark-color);
+            font-size: 1.4em;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+        
+        .explanation ul {
+            padding-left: 20px;
+        }
+        
+        .explanation li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .explanation li:before {
+            content: "•";
+            color: var(--accent-color);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .question {
+            background: linear-gradient(145deg, #fff8e1, #ffecb3);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border-left: 6px solid #ffc107;
+            box-shadow: 4px 4px 8px rgba(163, 177, 198, 0.1);
+        }
+        
+        .answer {
+            display: none;
+            background: linear-gradient(145deg, #e8f5e9, #c8e6c9);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 6px solid #4caf50;
+            box-shadow: 4px 4px 8px rgba(163, 177, 198, 0.1);
+        }
+        
+        .show-answer {
+            background: linear-gradient(145deg, var(--accent-color), #2ca789);
+            margin-top: 15px;
+        }
+        
+        .practice-section {
+            margin-top: 40px;
+        }
+        
+        .exercise {
+            background: linear-gradient(145deg, #f8f9fa, #e9ecef);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 6px solid var(--secondary-color);
+            box-shadow: 4px 4px 8px rgba(163, 177, 198, 0.1);
+        }
+        
+        .exercise h4 {
+            color: var(--dark-color);
+            margin-top: 0;
+            font-size: 1.2em;
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+        
+        .options {
+            margin: 20px 0;
+        }
+        
+        .option {
+            margin: 10px 0;
+            padding: 15px;
+            background: linear-gradient(145deg, #ffffff, #f1f3f5);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 3px 3px 6px rgba(163, 177, 198, 0.2),
+                       -3px -3px 6px rgba(255, 255, 255, 0.8);
+            position: relative;
+            padding-left: 45px;
+        }
+        
+        .option:hover {
+            transform: translateY(-3px);
+            box-shadow: 5px 5px 10px rgba(163, 177, 198, 0.2),
+                       -5px -5px 10px rgba(255, 255, 255, 0.8);
+        }
+        
+        .option:before {
+            content: "";
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            background-color: white;
+            transition: all 0.2s;
+        }
+        
+        .option.selected:before {
+            border-color: var(--primary-color);
+            background-color: var(--primary-color);
+        }
+        
+        .option.selected {
+            background: linear-gradient(145deg, #e6f7e6, #d4edda);
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .option.wrong {
+            background: linear-gradient(145deg, #fce8e8, #f8d7da);
+            border-left: 4px solid var(--error-color);
+        }
+        
+        .option.correct {
+            background: linear-gradient(145deg, #e6f7e6, #d4edda);
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .option.correct:before {
+            content: "✓";
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-color: var(--success-color);
+            background-color: var(--success-color);
+        }
+        
+        .option.wrong:before {
+            content: "✗";
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-color: var(--error-color);
+            background-color: var(--error-color);
+        }
+        
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            box-shadow: inset 3px 3px 6px rgba(0,0,0,0.05);
+        }
+        
+        .correct-feedback {
+            background: linear-gradient(145deg, #e6f7e6, #d4edda);
+            color: #155724;
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .wrong-feedback {
+            background: linear-gradient(145deg, #fce8e8, #f8d7da);
+            color: #721c24;
+            border-left: 4px solid var(--error-color);
+        }
+        
+        .submit-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .results {
+            display: none;
+            background: linear-gradient(145deg, #f5f7fa, #e6e9ed);
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+            box-shadow: 4px 4px 8px rgba(163, 177, 198, 0.1);
+            text-align: center;
+        }
+        
+        .results h3 {
+            margin-top: 0;
+            color: var(--dark-color);
+        }
+        
+        .retry-btn {
+            background: linear-gradient(145deg, var(--secondary-color), #2a8fb8);
+        }
+        
+        .variation-exercise {
+            background: linear-gradient(145deg, #fff3cd, #ffe69c);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 25px;
+            border-left: 6px solid #ffc107;
+            display: none;
+            box-shadow: 4px 4px 8px rgba(163, 177, 198, 0.1);
+        }
+        
+        .progress-bar {
+            height: 15px;
+            background: linear-gradient(145deg, #e9ecef, #dee2e6);
+            border-radius: 8px;
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: inset 3px 3px 6px rgba(163, 177, 198, 0.6);
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), #2ca789);
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: 2px 0 5px rgba(55, 188, 155, 0.5);
+        }
+        
+        @media (max-width: 768px) {
+            .scenario-container, .main-content {
+                flex-direction: column;
+            }
+            
+            .scenario-card, .graph-section, .theory-section {
+                width: 100%;
+            }
+            
+            .spring-container {
+                height: 200px;
+            }
+            
+            .control-group {
+                min-width: 100%;
+            }
+            
+            .step-indicator {
+                gap: 10px;
+            }
+            
+            .step {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1em;
+            }
+            
+            header {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .subtitle {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>三角函数图像变换</h1>
+            <p class="subtitle">从 y = sin(x) 到 y = A·sin(ωx + φ) 的变换过程</p>
+        </header>
+        
+        <div class="scenario-container">
+            <div class="scenario-card card">
+                <h2>弹簧振子模型</h2>
+                <div class="spring-container">
+                    <div class="spring-system">
+                        <div class="equilibrium" style="top: 125px;"></div>
+                        <div class="spring" id="spring" style="height: 125px;"></div>
+                        <div class="ball" id="ball" style="top: 125px;"></div>
+                    </div>
+                </div>
+                
+                <div class="parameter-display">
+                    <div class="parameter">
+                        <div>振幅 A</div>
+                        <div class="parameter-value" id="scenario-amplitude">1</div>
+                    </div>
+                    <div class="parameter">
+                        <div>角频率 ω</div>
+                        <div class="parameter-value" id="scenario-frequency">1</div>
+                    </div>
+                    <div class="parameter">
+                        <div>初相 φ</div>
+                        <div class="parameter-value" id="scenario-phase">0°</div>
+                    </div>
+                    <div class="parameter">
+                        <div>周期 T</div>
+                        <div class="parameter-value" id="scenario-period">6.28</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="scenario-amplitude-slider">振幅 A</label>
+                        <input type="range" id="scenario-amplitude-slider" min="0.5" max="2" step="0.1" value="1">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="scenario-frequency-slider">角频率 ω</label>
+                        <input type="range" id="scenario-frequency-slider" min="0.5" max="2" step="0.1" value="1">
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="scenario-phase-slider">初相 φ (度)</label>
+                        <input type="range" id="scenario-phase-slider" min="-180" max="180" step="5" value="0">
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="start-scenario">开始演示</button>
+                    <button id="pause-scenario">暂停</button>
+                    <button id="reset-scenario">重置</button>
+                </div>
+            </div>
+            
+            <div class="scenario-card card">
+                <h2>函数图像变化</h2>
+                <div class="graph-container">
+                    <canvas id="scenarioGraph"></canvas>
+                </div>
+                
+                <div class="explanation">
+                    <h3>物理模型与正弦函数的关系</h3>
+                    <ul>
+                        <li><strong>振幅A</strong>：小球运动的最大位移，对应正弦曲线的最大高度</li>
+                        <li><strong>角频率ω</strong>：决定小球振动的快慢，ω越大振动越快</li>
+                        <li><strong>初相φ</strong>：决定小球初始时刻的位置</li>
+                        <li><strong>周期T</strong>：完成一次完整振动所需时间，T = 2π/ω</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="graph-section card">
+                <h2>函数图像变换</h2>
+                <div class="graph-container">
+                    <canvas id="sinGraph"></canvas>
+                </div>
+                
+                <div class="controls">
+                    <div class="control-group">
+                        <label for="amplitude">振幅 A</label>
+                        <input type="range" id="amplitude" min="0.1" max="3" step="0.1" value="1">
+                        <div class="value-display">A = <span id="amplitude-value">1</span></div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="frequency">角频率 ω</label>
+                        <input type="range" id="frequency" min="0.1" max="3" step="0.1" value="1">
+                        <div class="value-display">ω = <span id="frequency-value">1</span></div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <label for="phase">相位 φ (度)</label>
+                        <input type="range" id="phase" min="-180" max="180" step="5" value="0">
+                        <div class="value-display">φ = <span id="phase-value">0</span>°</div>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button id="reset-btn">重置</button>
+                    <button id="animate-btn">播放动画</button>
+                    <button id="show-original">显示原始函数</button>
+                </div>
+            </div>
+            
+            <div class="theory-section card">
+                <h2>变换原理</h2>
+                <div class="step-indicator">
+                    <div class="step active" data-step="1">1</div>
+                    <div class="step" data-step="2">2</div>
+                    <div class="step" data-step="3">3</div>
+                    <div class="step" data-step="4">4</div>
+                </div>
+                
+                <div id="step-1" class="explanation">
+                    <h3>步骤1: 原始函数 y = sin(x)</h3>
+                    <p>这是我们熟悉的sin函数图像，具有以下特征：</p>
+                    <ul>
+                        <li>振幅: 1 (波峰到波谷的距离是2)</li>
+                        <li>周期: 2π ≈ 6.28 (一个完整波形在x轴上的长度)</li>
+                        <li>相位: 0 (波形从原点开始)</li>
+                    </ul>
+                </div>
+                
+                <div id="step-2" class="explanation" style="display: none;">
+                    <h3>步骤2: 振幅变换 y = A·sin(x)</h3>
+                    <p>参数A控制函数的振幅(垂直伸缩):</p>
+                    <ul>
+                        <li>当A > 1时，图像垂直拉伸</li>
+                        <li>当0 < A < 1时，图像垂直压缩</li>
+                        <li>当A < 0时，图像还会垂直翻转</li>
+                    </ul>
+                    
+                    <div class="question">
+                        <p>如果将A从1改为2，图像会发生什么变化？</p>
+                        <button class="show-answer">显示答案</button>
+                        <div class="answer">
+                            <p>图像会在垂直方向上拉伸为原来的2倍。波峰从y=1变为y=2，波谷从y=-1变为y=-2。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="step-3" class="explanation" style="display: none;">
+                    <h3>步骤3: 周期变换 y = A·sin(ωx)</h3>
+                    <p>参数ω控制函数的周期(水平伸缩):</p>
+                    <ul>
+                        <li>周期T = 2π/|ω| ≈ 6.28/|ω|</li>
+                        <li>当ω > 1时，周期变短，图像水平压缩</li>
+                        <li>当0 < ω < 1时，周期变长，图像水平拉伸</li>
+                        <li>当ω < 0时，图像水平翻转且周期为2π/|ω|</li>
+                    </ul>
+                    
+                    <div class="question">
+                        <p>如果ω=2，新的周期是多少？图像会如何变化？</p>
+                        <button class="show-answer">显示答案</button>
+                        <div class="answer">
+                            <p>新周期T = 2π/2 ≈ 3.14。图像会在水平方向上压缩为原来的一半，一个完整的波形现在只需要π≈3.14单位的x值。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="step-4" class="explanation" style="display: none;">
+                    <h3>步骤4: 相位变换 y = A·sin(ωx + φ)</h3>
+                    <p>参数φ控制函数的相位(水平平移):</p>
+                    <ul>
+                        <li>φ > 0时，图像向左平移|φ|/ω个单位</li>
+                        <li>φ < 0时，图像向右平移|φ|/ω个单位</li>
+                        <li>平移量 = -φ/ω (因为ω也影响平移量)</li>
+                    </ul>
+                    
+                    <div class="question">
+                        <p>如果φ=90°且ω=1，图像会如何移动？如果ω=2呢？</p>
+                        <button class="show-answer">显示答案</button>
+                        <div class="answer">
+                            <p>当ω=1时，图像向左移动π/2≈1.57单位(90°)。当ω=2时，平移量为-φ/ω = -90°/2 = -45°，所以图像向左移动π/4≈0.79单位。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="question">
+                        <p>综合问题：描述y = 2sin(0.5x - 60°)相对于y = sin(x)的所有变换。</p>
+                        <button class="show-answer">显示答案</button>
+                        <div class="answer">
+                            <ol>
+                                <li>振幅变换：A=2，垂直拉伸2倍</li>
+                                <li>周期变换：ω=0.5，周期变为2π/0.5≈12.57，水平拉伸2倍</li>
+                                <li>相位变换：φ=-60°，向右平移60°/0.5=120°或2π/3≈2.09单位</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card practice-section">
+            <h2>课后练习</h2>
+            <div class="progress-bar">
+                <div class="progress" id="progress-bar"></div>
+            </div>
+            
+            <div id="exercise-container">
+                <div class="exercise" data-id="1">
+                    <h4>练习1: 振幅变换</h4>
+                    <p>函数 y = 3sin(x) 相对于 y = sin(x) 的图像变化是：</p>
+                    <div class="options">
+                        <div class="option" data-correct="false">A. 图像水平拉伸3倍</div>
+                        <div class="option" data-correct="true">B. 图像垂直拉伸3倍</div>
+                        <div class="option" data-correct="false">C. 图像向左平移3个单位</div>
+                        <div class="option" data-correct="false">D. 周期变为原来的1/3</div>
+                    </div>
+                    <div class="feedback correct-feedback" style="display: none;">
+                        <strong>正确！</strong> 参数A控制垂直方向的伸缩，A=3表示图像垂直拉伸3倍。
+                    </div>
+                    <div class="feedback wrong-feedback" style="display: none;">
+                        <strong>不正确。</strong> 参数A控制垂直方向的伸缩，A=3表示图像垂直拉伸3倍，而不是水平变化或平移。
+                    </div>
+                </div>
+                
+                <div class="exercise" data-id="2">
+                    <h4>练习2: 周期变换</h4>
+                    <p>函数 y = sin(2x) 的周期是多少？</p>
+                    <div class="options">
+                        <div class="option" data-correct="false">A. 4π</div>
+                        <div class="option" data-correct="false">B. 2π</div>
+                        <div class="option" data-correct="true">C. π</div>
+                        <div class="option" data-correct="false">D. π/2</div>
+                    </div>
+                    <div class="feedback correct-feedback" style="display: none;">
+                        <strong>正确！</strong> 周期T = 2π/ω = 2π/2 = π≈3.14。
+                    </div>
+                    <div class="feedback wrong-feedback" style="display: none;">
+                        <strong>不正确。</strong> 周期公式是T = 2π/ω，当ω=2时，周期T=π≈3.14。
+                    </div>
+                </div>
+                
+                <div class="exercise" data-id="3">
+                    <h4>练习3: 综合变换</h4>
+                    <p>函数 y = 0.5sin(3x + π/2) 描述正确的是：</p>
+                    <div class="options">
+                        <div class="option" data-correct="false">A. 振幅0.5，周期2π/3，是由y = 0.5sin3x向右平移π/6个单位</div>
+                        <div class="option" data-correct="true">B. 振幅0.5，周期2π/3，是由y = 0.5sin3x向左平移π/6个单位</div>
+                        <div class="option" data-correct="false">C. 振幅0.5，周期6π，是由y = 0.5sin3x向左平移π/2个单位</div>
+                        <div class="option" data-correct="false">D. 振幅0.5，周期π/3，是由y = 0.5sin3x向右平移π/2个单位</div>
+                    </div>
+                    <div class="feedback correct-feedback" style="display: none;">
+                        <strong>正确！</strong> 
+                        <ul>
+                            <li>振幅A=0.5，垂直压缩为原来的一半</li>
+                            <li>ω=3，周期T=2π/3≈2.09</li>
+                            <li>φ=π/2≈1.57，向左平移π/6≈0.52个单位</li>
+                        </ul>
+                    </div>
+                    <div class="feedback wrong-feedback" style="display: none;">
+                        <strong>不正确。</strong> 正确的变换是：
+                        <ul>
+                            <li>振幅A=0.5，垂直压缩为原来的一半</li>
+                            <li>ω=3，周期T=2π/3≈2.09</li>
+                            <li>φ=π/2≈1.57，向左平移π/6≈0.52个单位</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="exercise" data-id="4">
+                    <h4>练习4: 综合变换</h4>
+                    <p>函数 y = -2sin(0.5x - π/4) 描述不正确的是：</p>
+                    <div class="options">
+                        <div class="option" data-correct="false">A. 振幅为2</div>
+                        <div class="option" data-correct="false">B. 周期为4π</div>
+                        <div class="option" data-correct="false">C. 是由y = -2sin(0.5x)图像向右平移π/2个单位</div>
+                        <div class="option" data-correct="true">D. 图像垂直压缩为原来的一半</div>
+                    </div>
+                    <div class="feedback correct-feedback" style="display: none;">
+                        <strong>正确！</strong> A=2表示垂直拉伸2倍，不是压缩。
+                    </div>
+                    <div class="feedback wrong-feedback" style="display: none;">
+                        <strong>不正确。</strong> A=-2表示垂直拉伸2倍且图像翻转，不是压缩。其他选项描述正确：<br>
+                        A. 振幅为|A|=2<br>
+                        B. 周期T=2π/0.5=4π≈12.57<br>
+                        C. 平移量=-φ/ω=-(π/4)/0.5=π/2≈1.57，向右平移
+                    </div>
+                </div>
+            </div>
+            
+            <div class="submit-section">
+                <button id="submit-practice">提交练习</button>
+            </div>
+            
+            <div class="results" id="results">
+                <h3>练习结果</h3>
+                <p>你的得分: <span id="score">0</span>/<span id="total">0</span></p>
+                <p id="result-message"></p>
+                <button id="retry-btn" class="retry-btn">重做错题</button>
+            </div>
+        </div>
+        
+        <div class="card" id="variation-training" style="display: none;">
+            <h2>变式训练</h2>
+            <div id="variation-container">
+                <!-- 变式练习将在这里动态生成 -->
+            </div>
+            <div class="submit-section">
+                <button id="submit-variation">提交变式练习</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 情景引入动画
+            let scenarioAnimation;
+            let scenarioTime = 0;
+            let isScenarioPlaying = false;
+            
+            let scenarioParams = {
+                A: 1,
+                ω: 1,
+                φ: 0
+            };
+            
+            const scenarioCtx = document.getElementById('scenarioGraph').getContext('2d');
+            const scenarioChart = new Chart(scenarioCtx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'y = A·sin(ωx + φ)',
+                            borderColor: '#37bc9b',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            data: [],
+                            fill: false
+                        },
+                        {
+                            label: '当前时刻',
+                            borderColor: '#e74c3c',
+                            borderWidth: 1,
+                            pointRadius: 5,
+                            data: [],
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'center',
+                            min: 0,
+                            max: 4 * Math.PI,
+                            ticks: {
+                                callback: function(value) {
+                                    if (value === 0) return '0';
+                                    if (value % Math.PI === 0) {
+                                        return (value / Math.PI) + 'π';
+                                    }
+                                    if (value % (Math.PI/2) === 0) {
+                                        return (value / Math.PI) + 'π/2';
+                                    }
+                                    return value.toFixed(2);
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'center',
+                            min: -2.5,
+                            max: 2.5,
+                            ticks: {
+                                stepSize: 0.5
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 0
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                }
+            });
+            
+            function updateScenarioChart() {
+                const data = [];
+                const currentPoint = [];
+                const steps = 100;
+                const range = 4 * Math.PI;
+                
+                for (let i = 0; i <= steps; i++) {
+                    const x = (range * i) / steps;
+                    data.push({
+                        x: x,
+                        y: scenarioParams.A * Math.sin(scenarioParams.ω * x + (scenarioParams.φ * Math.PI / 180))
+                    });
+                }
+                
+                const currentY = scenarioParams.A * Math.sin(scenarioParams.ω * scenarioTime + (scenarioParams.φ * Math.PI / 180));
+                currentPoint.push({
+                    x: scenarioTime,
+                    y: currentY
+                });
+                
+                scenarioChart.data.datasets[0].data = data;
+                scenarioChart.data.datasets[1].data = currentPoint;
+                scenarioChart.update();
+                
+                updateBallPosition(currentY);
+            }
+            
+            function updateBallPosition(y) {
+                const ball = document.getElementById('ball');
+                const equilibrium = 125;
+                const amplitude = 80;
+                const ballTop = equilibrium - (y * amplitude);
+                ball.style.top = ballTop + 'px';
+                document.getElementById('spring').style.height = (ballTop + 15) + 'px';
+            }
+            
+            function updateScenarioDisplay() {
+                document.getElementById('scenario-amplitude').textContent = scenarioParams.A.toFixed(1);
+                document.getElementById('scenario-frequency').textContent = scenarioParams.ω.toFixed(1);
+                document.getElementById('scenario-phase').textContent = scenarioParams.φ + '°';
+                document.getElementById('scenario-period').textContent = (2 * Math.PI / scenarioParams.ω).toFixed(2);
+            }
+            
+            function startScenarioAnimation() {
+                if (isScenarioPlaying) return;
+                isScenarioPlaying = true;
+                const startTime = Date.now();
+                
+                scenarioAnimation = anime({
+                    duration: Infinity,
+                    update: function() {
+                        const elapsed = (Date.now() - startTime) / 1000;
+                        scenarioTime = elapsed % (4 * Math.PI);
+                        updateScenarioChart();
+                    }
+                });
+            }
+            
+            function pauseScenarioAnimation() {
+                if (!isScenarioPlaying) return;
+                isScenarioPlaying = false;
+                if (scenarioAnimation) scenarioAnimation.pause();
+            }
+            
+            function resetScenario() {
+                pauseScenarioAnimation();
+                scenarioTime = 0;
+                updateScenarioChart();
+            }
+            
+            document.getElementById('scenario-amplitude-slider').addEventListener('input', function() {
+                scenarioParams.A = parseFloat(this.value);
+                updateScenarioDisplay();
+                updateScenarioChart();
+            });
+            
+            document.getElementById('scenario-frequency-slider').addEventListener('input', function() {
+                scenarioParams.ω = parseFloat(this.value);
+                updateScenarioDisplay();
+                updateScenarioChart();
+            });
+            
+            document.getElementById('scenario-phase-slider').addEventListener('input', function() {
+                scenarioParams.φ = parseFloat(this.value);
+                updateScenarioDisplay();
+                updateScenarioChart();
+            });
+            
+            document.getElementById('start-scenario').addEventListener('click', startScenarioAnimation);
+            document.getElementById('pause-scenario').addEventListener('click', pauseScenarioAnimation);
+            document.getElementById('reset-scenario').addEventListener('click', resetScenario);
+            
+            updateScenarioDisplay();
+            updateScenarioChart();
+            
+            const ctx = document.getElementById('sinGraph').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'y = sin(x)',
+                            borderColor: '#4a89dc',
+                            borderWidth: 2,
+                            pointRadius: 0,
+                            data: [],
+                            fill: false
+                        },
+                        {
+                            label: 'y = A·sin(ωx + φ)',
+                            borderColor: '#37bc9b',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            data: [],
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'center',
+                            min: -2 * Math.PI,
+                            max: 2 * Math.PI,
+                            ticks: {
+                                callback: function(value) {
+                                    if (value === 0) return '0';
+                                    if (value % Math.PI === 0) {
+                                        return (value / Math.PI) + 'π';
+                                    }
+                                    if (value % (Math.PI/2) === 0) {
+                                        return (value / Math.PI) + 'π/2';
+                                    }
+                                    return value.toFixed(2);
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'center',
+                            min: -3,
+                            max: 3,
+                            ticks: {
+                                stepSize: 1
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuad'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.parsed.y.toFixed(3);
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            let params = {
+                A: 1,
+                ω: 1,
+                φ: 0,
+                showOriginal: true
+            };
+            
+            function generateData() {
+                const originalData = [];
+                const transformedData = [];
+                const steps = 200;
+                const range = 4 * Math.PI;
+                const start = -2 * Math.PI;
+                
+                for (let i = 0; i <= steps; i++) {
+                    const x = start + (range * i) / steps;
+                    originalData.push({x, y: Math.sin(x)});
+                    transformedData.push({
+                        x, 
+                        y: params.A * Math.sin(params.ω * x + (params.φ * Math.PI / 180))
+                    });
+                }
+                
+                return {originalData, transformedData};
+            }
+            
+            function updateChart() {
+                const {originalData, transformedData} = generateData();
+                chart.data.datasets[0].data = params.showOriginal ? originalData : [];
+                chart.data.datasets[1].data = transformedData;
+                chart.update();
+            }
+            
+            function updateDisplay() {
+                document.getElementById('amplitude-value').textContent = params.A;
+                document.getElementById('frequency-value').textContent = params.ω;
+                document.getElementById('phase-value').textContent = params.φ;
+            }
+            
+            function resetParams() {
+                params = {
+                    A: 1,
+                    ω: 1,
+                    φ: 0,
+                    showOriginal: true
+                };
+                document.getElementById('amplitude').value = params.A;
+                document.getElementById('frequency').value = params.ω;
+                document.getElementById('phase').value = params.φ;
+                updateDisplay();
+                updateChart();
+                setActiveStep(1);
+            }
+            
+            function setActiveStep(stepNum) {
+                console.log("激活步骤:", stepNum);
+                const steps = document.querySelectorAll('.step');
+                const explanations = document.querySelectorAll('.explanation');
+                
+                steps.forEach((step, index) => {
+                    const stepValue = parseInt(step.getAttribute('data-step'));
+                    step.classList.remove('active', 'completed');
+                    if (stepValue === stepNum) {
+                        step.classList.add('active');
+                    } else if (stepValue < stepNum) {
+                        step.classList.add('completed');
+                    }
+                });
+                
+                explanations.forEach((explanation, index) => {
+                    const explanationStep = parseInt(explanation.id.split('-')[1]);
+                    explanation.style.display = (explanationStep === stepNum) ? 'block' : 'none';
+                });
+            }
+            
+            function animateTransform() {
+                setActiveStep(1);
+                params = {
+                    A: 1,
+                    ω: 1,
+                    φ: 0,
+                    showOriginal: true
+                };
+                updateDisplay();
+                updateChart();
+                
+                setTimeout(() => {
+                    setActiveStep(2);
+                    anime({
+                        targets: params,
+                        A: 2,
+                        duration: 2000,
+                        easing: 'easeInOutQuad',
+                        update: updateChart,
+                        complete: function() {
+                            setTimeout(() => {
+                                setActiveStep(3);
+                                anime({
+                                    targets: params,
+                                    ω: 2,
+                                    duration: 2000,
+                                    easing: 'easeInOutQuad',
+                                    update: updateChart,
+                                    complete: function() {
+                                        setTimeout(() => {
+                                            setActiveStep(4);
+                                            anime({
+                                                targets: params,
+                                                φ: 90,
+                                                duration: 2000,
+                                                easing: 'easeInOutQuad',
+                                                update: updateChart
+                                            });
+                                        }, 1000);
+                                    }
+                                });
+                            }, 1000);
+                        }
+                    });
+                }, 1000);
+            }
+            
+            let practiceState = {
+                answered: 0,
+                correct: 0,
+                wrongExercises: []
+            };
+            
+            const variationExercises = {
+                1: [
+                    {
+                        question: "函数 y = 0.5sin(x) 相对于 y = sin(x) 的图像变化是：",
+                        options: [
+                            "A. 图像水平压缩为原来的一半",
+                            "B. 图像垂直压缩为原来的一半",
+                            "C. 图像向右平移0.5个单位",
+                            "D. 周期变为原来的两倍"
+                        ],
+                        correct: 1,
+                        explanation: "参数A=0.5表示图像垂直压缩为原来的一半。"
+                    }
+                ],
+                2: [
+                    {
+                        question: "函数 y = sin(0.5x) 的周期是多少？",
+                        options: [
+                            "A. π",
+                            "B. 2π",
+                            "C. 4π",
+                            "D. 8π"
+                        ],
+                        correct: 2,
+                        explanation: "周期T = 2π/ω = 2π/0.5 = 4π≈12.57。"
+                    }
+                ],
+                3: [
+                    {
+                        question: "函数 y = 1.5sin(2x - π/3) 描述正确的是：",
+                        options: [
+                            "A. 振幅1.5，周期π，由y = 1.5sin(2x)向右平移π/6个单位",
+                            "B. 振幅1.5，周期2π，由y = 1.5sin(2x)向左平移π/3个单位",
+                            "C. 振幅1.5，周期π/2，由y = 1.5sin(2x)向右平移π/3个单位",
+                            "D. 振幅1.5，周期π，由y = 1.5sin(2x)向左平移π/6个单位"
+                        ],
+                        correct: 0,
+                        explanation: "A=1.5，ω=2→T=π≈3.14，φ=-π/3≈-1.05→平移量=π/6≈0.52，向右平移。"
+                    }
+                ],
+                4: [
+                    {
+                        question: "函数 y = -0.8sin(1.5x + π/4) 描述不正确的是：",
+                        options: [
+                            "A. 振幅0.8，周期4π/3，由y = -0.8sin(1.5x)向左平移π/6个单位",
+                            "B. 振幅0.8，图像垂直翻转",
+                            "C. 周期3π/2，由y = -0.8sin(1.5x)向右平移π/4个单位",
+                            "D. 振幅0.8，周期4π/3，由y = -0.8sin(1.5x)向右平移π/6个单位"
+                        ],
+                        correct: 3,
+                        explanation: "A=-0.8→振幅0.8且翻转，ω=1.5→T=4π/3≈4.19，φ=π/4≈0.79→平移量=-π/6≈-0.52(左移π/6)。"
+                    }
+                ]
+            };
+            
+            function initPractice() {
+                const options = document.querySelectorAll('.option');
+                options.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const exercise = this.closest('.exercise');
+                        const options = exercise.querySelectorAll('.option');
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                        updateProgressBar();
+                    });
+                });
+                updateProgressBar();
+            }
+            
+            function updateProgressBar() {
+                const exercises = document.querySelectorAll('.exercise');
+                let answered = 0;
+                exercises.forEach(exercise => {
+                    if (exercise.querySelector('.selected')) answered++;
+                });
+                const progress = (answered / exercises.length) * 100;
+                document.getElementById('progress-bar').style.width = progress + '%';
+            }
+            
+            function submitPractice() {
+                const exercises = document.querySelectorAll('.exercise');
+                let correct = 0;
+                practiceState.wrongExercises = [];
+                
+                exercises.forEach(exercise => {
+                    const selected = exercise.querySelector('.selected');
+                    const id = parseInt(exercise.getAttribute('data-id'));
+                    
+                    if (selected) {
+                        const isCorrect = selected.getAttribute('data-correct') === 'true';
+                        const feedback = isCorrect 
+                            ? exercise.querySelector('.correct-feedback')
+                            : exercise.querySelector('.wrong-feedback');
+                        feedback.style.display = 'block';
+                        
+                        const options = exercise.querySelectorAll('.option');
+                        options.forEach(option => {
+                            option.classList.remove('correct', 'wrong');
+                            if (option.getAttribute('data-correct') === 'true') {
+                                option.classList.add('correct');
+                            } else if (option === selected && !isCorrect) {
+                                option.classList.add('wrong');
+                            }
+                        });
+                        
+                        if (isCorrect) correct++;
+                        else practiceState.wrongExercises.push(id);
+                    }
+                });
+                
+                practiceState.answered = exercises.length;
+                practiceState.correct = correct;
+                showResults();
+            }
+            
+            function showResults() {
+                document.getElementById('score').textContent = practiceState.correct;
+                document.getElementById('total').textContent = practiceState.answered;
+                const percentage = (practiceState.correct / practiceState.answered) * 100;
+                const resultMessage = document.getElementById('result-message');
+                
+                if (percentage >= 80) {
+                    resultMessage.textContent = "优秀！你已经掌握了三角函数图像变换的主要内容。";
+                    resultMessage.style.color = 'var(--success-color)';
+                } else if (percentage >= 50) {
+                    resultMessage.textContent = "不错，但还有一些概念需要加强练习。";
+                    resultMessage.style.color = 'var(--primary-color)';
+                } else {
+                    resultMessage.textContent = "需要更多的练习来掌握这些概念，请查看错题并尝试变式训练。";
+                    resultMessage.style.color = 'var(--error-color)';
+                }
+                
+                document.getElementById('results').style.display = 'block';
+                if (practiceState.wrongExercises.length > 0) {
+                    document.getElementById('variation-training').style.display = 'block';
+                    generateVariationExercises();
+                }
+            }
+            
+            function generateVariationExercises() {
+                const container = document.getElementById('variation-container');
+                container.innerHTML = '';
+                
+                practiceState.wrongExercises.forEach(id => {
+                    const variations = variationExercises[id];
+                    if (variations && variations.length > 0) {
+                        const variation = variations[0];
+                        const exerciseDiv = document.createElement('div');
+                        exerciseDiv.className = 'variation-exercise';
+                        exerciseDiv.innerHTML = `
+                            <h5>变式练习 (原题${id})</h5>
+                            <p>${variation.question}</p>
+                            <div class="options">
+                                ${variation.options.map((opt, i) => `
+                                    <div class="option" data-correct="${i === variation.correct}">${opt}</div>
+                                `).join('')}
+                            </div>
+                            <div class="feedback correct-feedback" style="display: none;">
+                                <strong>正确！</strong> ${variation.explanation}
+                            </div>
+                            <div class="feedback wrong-feedback" style="display: none;">
+                                <strong>不正确。</strong> ${variation.explanation}
+                            </div>
+                        `;
+                        container.appendChild(exerciseDiv);
+                    }
+                });
+                
+                const variationOptions = container.querySelectorAll('.option');
+                variationOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const exercise = this.closest('.variation-exercise');
+                        const options = exercise.querySelectorAll('.option');
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                    });
+                });
+                
+                document.querySelectorAll('.variation-exercise').forEach(ex => {
+                    ex.style.display = 'block';
+                });
+            }
+            
+            function submitVariation() {
+                const exercises = document.querySelectorAll('.variation-exercise');
+                let allCorrect = true;
+                
+                exercises.forEach(exercise => {
+                    const selected = exercise.querySelector('.selected');
+                    if (selected) {
+                        const isCorrect = selected.getAttribute('data-correct') === 'true';
+                        const feedback = isCorrect 
+                            ? exercise.querySelector('.correct-feedback')
+                            : exercise.querySelector('.wrong-feedback');
+                        feedback.style.display = 'block';
+                        
+                        const options = exercise.querySelectorAll('.option');
+                        options.forEach(option => {
+                            option.classList.remove('correct', 'wrong');
+                            if (option.getAttribute('data-correct') === 'true') {
+                                option.classList.add('correct');
+                            } else if (option === selected && !isCorrect) {
+                                option.classList.add('wrong');
+                                allCorrect = false;
+                            }
+                        });
+                    } else {
+                        allCorrect = false;
+                    }
+                });
+                
+                if (allCorrect) alert('恭喜！你已经掌握了这些变式练习！');
+                else alert('还有一些错误，请查看反馈并继续练习！');
+            }
+            
+            function retryWrongExercises() {
+                const exercises = document.querySelectorAll('.exercise');
+                exercises.forEach(exercise => {
+                    const id = parseInt(exercise.getAttribute('data-id'));
+                    if (practiceState.wrongExercises.includes(id)) {
+                        const options = exercise.querySelectorAll('.option');
+                        options.forEach(option => {
+                            option.classList.remove('selected', 'correct', 'wrong');
+                        });
+                        
+                        const feedbacks = exercise.querySelectorAll('.feedback');
+                        feedbacks.forEach(fb => fb.style.display = 'none');
+                    }
+                });
+                
+                document.getElementById('results').style.display = 'none';
+                document.getElementById('variation-training').style.display = 'none';
+                document.querySelector('.practice-section').scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            document.getElementById('amplitude').addEventListener('input', function() {
+                params.A = parseFloat(this.value);
+                updateDisplay();
+                updateChart();
+            });
+            
+            document.getElementById('frequency').addEventListener('input', function() {
+                params.ω = parseFloat(this.value);
+                updateDisplay();
+                updateChart();
+            });
+            
+            document.getElementById('phase').addEventListener('input', function() {
+                params.φ = parseFloat(this.value);
+                updateDisplay();
+                updateChart();
+            });
+            
+            document.getElementById('reset-btn').addEventListener('click', resetParams);
+            document.getElementById('animate-btn').addEventListener('click', animateTransform);
+            
+            document.getElementById('show-original').addEventListener('click', function() {
+                params.showOriginal = !params.showOriginal;
+                this.textContent = params.showOriginal ? '隐藏原始函数' : '显示原始函数';
+                updateChart();
+            });
+            
+            document.querySelectorAll('.step').forEach(step => {
+                step.addEventListener('click', function() {
+                    const stepNum = parseInt(this.getAttribute('data-step'));
+                    setActiveStep(stepNum);
+                    
+                    switch(stepNum) {
+                        case 1: params = { A: 1, ω: 1, φ: 0 }; break;
+                        case 2: params = { A: 2, ω: 1, φ: 0 }; break;
+                        case 3: params = { A: 1, ω: 2, φ: 0 }; break;
+                        case 4: params = { A: 1, ω: 1, φ: 90 }; break;
+                    }
+                    
+                    document.getElementById('amplitude').value = params.A;
+                    document.getElementById('frequency').value = params.ω;
+                    document.getElementById('phase').value = params.φ;
+                    updateDisplay();
+                    updateChart();
+                });
+            });
+            
+            document.querySelectorAll('.show-answer').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const answer = this.nextElementSibling;
+                    answer.style.display = answer.style.display === 'block' ? 'none' : 'block';
+                    this.textContent = answer.style.display === 'block' ? '隐藏答案' : '显示答案';
+                });
+            });
+            
+            document.getElementById('submit-practice').addEventListener('click', submitPractice);
+            document.getElementById('retry-btn').addEventListener('click', retryWrongExercises);
+            document.getElementById('submit-variation').addEventListener('click', submitVariation);
+            
+            resetParams();
+            initPractice();
+        });
+    </script>
+</body>
+</html>
